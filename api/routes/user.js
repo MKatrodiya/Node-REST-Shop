@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -39,6 +40,51 @@ router.post("/signup", (req, res, next) => {
                 });
               });
           }
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        error,
+      });
+    });
+});
+
+router.post("/signin", (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .exec()
+    .then((user) => {
+      if (user) {
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
+          if (err) {
+            return res.status(401).json({
+              message: "Authentication failed",
+            });
+          }
+          if (result) {
+            const token = jwt.sign(
+              {
+                email: user.email,
+                _id: user._id,
+              },
+              process.env.JWT_SECRET,
+              {
+                expiresIn: "1h",
+              }
+            );
+            return res.status(200).json({
+              message: "Authentication successful",
+              token,
+            });
+          }
+          return res.status(401).json({
+            message: "Authentication failed",
+          });
+        });
+      } else {
+        res.status(401).json({
+          message: "Authentication failed",
         });
       }
     })

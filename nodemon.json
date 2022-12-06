@@ -1,5 +1,6 @@
 {
     "env": {
-        "MONGODB_ATLAS_PASSWORD": "MeetK1234"
+        "MONGODB_ATLAS_PASSWORD": "MeetK1234",
+        "JWT_SECRET": "secret12"
     }
 }
