@@ -1,11 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
+import checkAuth from "../middleware/check-auth.js";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
+router.get("/", checkAuth, (req, res, next) => {
   Order.find()
     .select("product quantity _id")
     .populate("product", "name")
@@ -33,7 +34,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", checkAuth, async (req, res, next) => {
   try {
     const product = await Product.findById(req.body.productId).exec();
 
@@ -70,7 +71,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/:orderId", (req, res, next) => {
+router.get("/:orderId", checkAuth, (req, res, next) => {
   Order.findById(req.params.orderId)
     .populate("product", "name")
     .exec()
